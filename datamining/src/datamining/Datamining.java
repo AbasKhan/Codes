@@ -35,6 +35,7 @@ public class Datamining {
         Random rn=new Random();
     
         int k=0;
+        System.out.println("Please input the number of clusters you want");
         Scanner sc=new Scanner(System.in);
         k=sc.nextInt();
         ArrayList<Double>[] group1 = (ArrayList<Double>[])new ArrayList[k];
