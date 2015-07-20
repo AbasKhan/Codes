@@ -1,0 +1,10 @@
+
+html, body {
+
+	font-size:12px;
+	font-family:"Open Sans", serif;
+	min-width:960px;
+	margin:0;
+	padding:0;
+	color:#aaa;
+}

@@ -1,0 +1,41 @@
+ #cart {
+            border: 1px solid grey;
+            height: 200px;  
+            width: 150px;  
+            margin-left:400px;
+            margin-top: -205px;
+            }
+            #img
+            {
+               border: 1px solid grey;
+               width: 200px;
+               margin-left: 200px;
+               margin-top: 150px; 
+            }
+            
+ 
+ 
+    #layr {
+             opacity:.9;
+             margin-left: 200px;
+             margin-top: 80px;
+            
+       
+             height: auto;
+             width: auto;
+             
+            background-color: #fff;
+            }
+
+
+             .submit {
+            width: auto;  
+    padding: 9px 15px;  
+    background: #617798;  
+    border: 0;  
+    font-size: 14px;  
+    color: #FFFFFF;  
+     -webkit-border-radius: 5px;  
+    -moz-border-radius: 5px;  
+    cursor:pointer
+            }
