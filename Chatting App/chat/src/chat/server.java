@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.*;
 import java.lang.Object;
+import org.apache.commons.io.FileUtils;
 /**
  *
  * @author Abbas
@@ -17,6 +18,7 @@ public class server extends javax.swing.JFrame implements Runnable {
     Socket client =null;
     BufferedReader br;
     BufferedWriter bw;
+    String rn;
     /**
      * Creates new form Frm
      */
@@ -28,7 +30,6 @@ public class server extends javax.swing.JFrame implements Runnable {
            client=s1.accept();
            br=new BufferedReader(new InputStreamReader(client.getInputStream()));
            bw=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-           bw.write("Chaterr box");
            bw.newLine();
            bw.flush();
            Thread th=new Thread(this);
@@ -45,16 +46,27 @@ public class server extends javax.swing.JFrame implements Runnable {
     }
 public void run()
 {
+    String message;
+    int result;
+    String random="";
+    StringBuilder decypt = new StringBuilder();
     while(true)
             {
-    try{
-    
-        Area.setText(""+br.readLine());
+        try{
+            message=br.readLine();
+            if(message.length()>0)
+                {
+                    random = FileUtils.readFileToString(new File("random.txt"), "UTF-8");
+                }
+            for(int i=0;i<message.length();i++){
+                result = message.charAt(i) ^ random.charAt(i);
+                decypt.append((char)result);}
+            
+                System.err.println(decypt.toString());
+                Area.setText(decypt.toString());        
 }
-catch(Exception e)
-{
+catch(Exception e){}
     
-}
             }
     
 }
@@ -145,13 +157,31 @@ catch(Exception e)
     }// </editor-fold>//GEN-END:initComponents
 
     private void ChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChatActionPerformed
-       
+       String random;
+       String message;
         try
         {
-             bw.write(Message.getText());
-             bw.newLine();
-             bw.flush();
-             Message.setText("");
+            message=Message.getText();
+            random=getRandom(message.length());
+            
+            PrintWriter writer = new PrintWriter("random.txt");
+            writer.println(random);    
+            writer.close();
+            
+            
+            System.err.println("server generated "+random);
+            int result;
+            StringBuilder cypher = new StringBuilder();
+      
+            for(int i=0;i<message.length();i++){
+                result = message.charAt(i) ^ random.charAt(i);
+                cypher.append((char)result);
+            }
+            System.err.println("Server sent "+cypher);
+            bw.write(cypher.toString());
+            bw.newLine();
+            bw.flush();
+            Message.setText("");
         }catch(Exception e)
         {
             
@@ -160,6 +190,30 @@ catch(Exception e)
         
     }//GEN-LAST:event_ChatActionPerformed
 
+    private String getRandom(int number_of_bits) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+        Reader r = new BufferedReader(new InputStreamReader(
+                new FileInputStream("/dev/random"), "US-ASCII"));
+        try {
+          StringBuilder resultBuilder = new StringBuilder();
+          int count = 0;
+          int intch;
+          while (((intch = r.read()) != -1) && count < number_of_bits) {
+            resultBuilder.append((char) intch);
+            count++;
+          }
+          rn=resultBuilder.toString();
+          return resultBuilder.toString();
+        } 
+        finally {r.close();}
+          
+    
+    }
+    
+    public String returnRandom(){
+        return rn;
+    }
+    
+    
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
         System.exit(1);
     }//GEN-LAST:event_ExitActionPerformed

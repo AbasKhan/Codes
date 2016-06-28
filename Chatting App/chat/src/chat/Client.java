@@ -2,11 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package client;
-import java.awt.*;
-import java.awt.event.*;
+package chat;
 import java.net.*;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -16,6 +17,7 @@ public class Client extends javax.swing.JFrame implements Runnable {
         Socket s;
 	BufferedReader br;
 	BufferedWriter bw;
+        server serv = new server();
     /**
      * Creates new form Clnt
      */
@@ -27,6 +29,8 @@ public class Client extends javax.swing.JFrame implements Runnable {
                         s = new Socket("127.0.0.1", 1053);
                         br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+                        bw.newLine();
+                        bw.flush();
 			Thread th;
 			th = new Thread(this);
 			th.start();
@@ -37,13 +41,28 @@ public class Client extends javax.swing.JFrame implements Runnable {
         
     public void run()
     {
-         while (true)
-		{
-			try
-                        {
-                                Area.setText(br.readLine());
-			}catch (Exception h){}
-		}
+        String message;
+        int result;
+        String random="";
+        StringBuilder decypt = new StringBuilder();
+        while (true)
+        {
+            try
+            {
+                message=br.readLine();
+                if(message.length()>0)
+                {
+                    
+                    random = FileUtils.readFileToString(new File("random.txt"), "UTF-8");
+                }
+                for(int i=0;i<message.length();i++){
+                    result = message.charAt(i) ^ random.charAt(i);
+                    decypt.append((char)result);
+                }
+                System.err.println(decypt.toString());
+                Area.setText(decypt.toString());
+            }catch (Exception h){}
+        }
     }
 
     /**
@@ -118,11 +137,28 @@ public class Client extends javax.swing.JFrame implements Runnable {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
          try
         {
-             bw.write(Message.getText());
+            
+            String message = Message.getText();
+            String random = getRandom(message.length());
+            PrintWriter writer = new PrintWriter("random.txt");
+            writer.println(random);    
+            writer.close();
+            
+            
+            int result;
+            StringBuilder cypher = new StringBuilder();
+      
+            for(int i=0;i<message.length();i++){
+                result = message.charAt(i) ^ random.charAt(i);
+                cypher.append((char)result);
+            }
+            
+             bw.write(cypher.toString());
              bw.newLine();
              bw.flush();
              Message.setText("");
@@ -131,6 +167,26 @@ public class Client extends javax.swing.JFrame implements Runnable {
             
         }
     }//GEN-LAST:event_sendActionPerformed
+    
+    
+        private String getRandom(int number_of_bits) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+        Reader r = new BufferedReader(new InputStreamReader(
+                new FileInputStream("/dev/random"), "US-ASCII"));
+        try {
+          StringBuilder resultBuilder = new StringBuilder();
+          int count = 0;
+          int intch;
+          while (((intch = r.read()) != -1) && count < number_of_bits) {
+            resultBuilder.append((char) intch);
+            count++;
+          }
+          return resultBuilder.toString();
+        } 
+        finally {r.close();}
+          
+    
+    }
+    
 
     private void exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitActionPerformed
        System.exit(1);
